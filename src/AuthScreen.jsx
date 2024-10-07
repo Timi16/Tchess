@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Button, TextField, Typography } from "@mui/material";
 
-const AuthScreen = () => {
+const AuthScreen = ({ navigateToForgotPassword }) => {
   const [isLogin, setIsLogin] = useState(true);
 
   const toggleMode = () => {
@@ -36,9 +36,17 @@ const AuthScreen = () => {
           fullWidth
           margin="normal"
         />
+
+        {isLogin && (
+          <ForgotPasswordText onClick={navigateToForgotPassword}>
+            Forgot Password?
+          </ForgotPasswordText>
+        )}
+
         <StyledButton variant="contained" fullWidth>
           {isLogin ? "Login" : "Register"}
         </StyledButton>
+
         <SwitchModeText onClick={toggleMode}>
           {isLogin
             ? "Don't have an account? Register"
@@ -66,14 +74,6 @@ const FormWrapper = styled.div`
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
-
-  @media (max-width: 480px) {
-    max-width: 90%;
-  }
 `;
 
 const Title = styled(Typography)`
@@ -113,6 +113,16 @@ const StyledButton = styled(Button)`
 
   &:hover {
     background-color: #1a1aff !important;
+  }
+`;
+
+const ForgotPasswordText = styled(Typography)`
+  color: white;
+  text-align: right;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  &:hover {
+    color: #0000ff;
   }
 `;
 
