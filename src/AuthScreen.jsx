@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Button, TextField, Typography, CircularProgress, Snackbar } from "@mui/material";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 
 const AuthScreen = ({ onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -12,7 +12,7 @@ const AuthScreen = ({ onLoginSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
@@ -70,19 +70,22 @@ const AuthScreen = ({ onLoginSuccess }) => {
         }
 
         const data = await response.json();
-        
+
+        // Check response status and handle accordingly
         if (response.ok) {
           if (isLogin) {
-            onLoginSuccess(data.username); // Pass username to the parent component
-            navigate("/home"); // Navigate to the home page
+            console.log("Login successful:", data); // Debugging log
+            onLoginSuccess(data.username); // Pass username to parent
+            navigate("/home"); // Navigate to home
           } else {
             setSnackbarMessage("Registration successful! Please log in.");
             setSnackbarOpen(true);
             setTimeout(() => {
-              navigate("/"); // Redirect to login page after showing message
-            }, 3000); // Wait for 3 seconds before navigating
+              navigate("/"); // Redirect to login after a delay
+            }, 3000);
           }
         } else {
+          console.log("Error response:", data); // Debugging log
           setSnackbarMessage(data.message || "An error occurred");
           setSnackbarOpen(true);
         }
@@ -94,7 +97,7 @@ const AuthScreen = ({ onLoginSuccess }) => {
         setLoading(false);
       }
     } else {
-      console.log("Form has errors");
+      console.log("Form has errors"); // Debugging log
     }
   };
 
@@ -170,6 +173,9 @@ const AuthScreen = ({ onLoginSuccess }) => {
 };
 
 export default AuthScreen;
+
+
+
 
 const Container = styled.div`
   height: 100vh;
