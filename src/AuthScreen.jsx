@@ -122,11 +122,13 @@ const AuthScreen = ({ onLoginSuccess }) => {
           helperText={errors.email}
         />
 
+        {/* Password input field updated to hide input */}
         <StyledTextField
           variant="outlined"
           label="Password"
           fullWidth
           margin="normal"
+          type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           error={!!errors.password}
