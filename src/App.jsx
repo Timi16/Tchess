@@ -1,29 +1,16 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AuthScreen from './AuthScreen';
-import Home from './Home';
+import Home from './Home'; // Ensure you have a Home component
 
-const App = () => {
-  const [username, setUsername] = useState(null);
-
-  const handleLoginSuccess = (user) => {
-    setUsername(user);
-  };
-
+function App() {
   return (
     <Router>
       <Routes>
-        <Route
-          path="/"
-          element={username ? <Navigate to="/home" /> : <AuthScreen onLoginSuccess={handleLoginSuccess} />}
-        />
-        <Route
-          path="/home"
-          element={username ? <Home username={username} /> : <Navigate to="/" />}
-        />
+        <Route path="/" element={<AuthScreen />} />
+        <Route path="/home" element={<Home />} />
       </Routes>
     </Router>
   );
-};
+}
 
 export default App;
