@@ -1,4 +1,3 @@
-// src/components/Login.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -7,15 +6,15 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const navigate = useNavigate(); // Use useNavigate here
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://127.0.0.1:5000/api/auth/login', { email, password });
+      const response = await axios.post('https://tchess-backend.onrender.com/api/auth/login', { email, password });
       localStorage.setItem('token', response.data.token);
-      localStorage.setItem('username', email.split('@')[0]); // Store the username from email
-      navigate('/home'); // Redirect to Home after successful login
+      localStorage.setItem('username', email.split('@')[0]);
+      navigate('/home');
     } catch (error) {
       setErrorMessage(error.response?.data?.message || 'Something went wrong');
     }
