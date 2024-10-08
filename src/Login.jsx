@@ -1,20 +1,21 @@
+// src/components/Login.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const history = useHistory();
+  const navigate = useNavigate(); // Use useNavigate here
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://127.0.0.1:5000/api/login', { email, password });
+      const response = await axios.post('http://192.168.1.100:5000/api/auth/login', { email, password });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('username', email.split('@')[0]); // Store the username from email
-      history.push('/home'); // Redirect to Home after successful login
+      navigate('/home'); // Redirect to Home after successful login
     } catch (error) {
       setErrorMessage(error.response?.data?.message || 'Something went wrong');
     }

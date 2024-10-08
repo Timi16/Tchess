@@ -1,19 +1,20 @@
+// src/components/Register.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const history = useHistory();
+  const navigate = useNavigate(); // Use useNavigate here
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://127.0.0.1:5000/api/register', { username, email, password });
-      history.push('/'); // Redirect to Login after successful registration
+      await axios.post('http://192.168.1.100:5000/api/auth/register', { username, email, password });
+      navigate('/'); // Redirect to Login after successful registration
     } catch (error) {
       setErrorMessage(error.response?.data?.message || 'Something went wrong');
     }
