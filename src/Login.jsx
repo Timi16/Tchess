@@ -12,7 +12,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://192.168.1.100:5000/api/auth/login', { email, password });
+      const response = await axios.post('http://127.0.0.1:5000/api/auth/login', { email, password });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('username', email.split('@')[0]); // Store the username from email
       navigate('/home'); // Redirect to Home after successful login

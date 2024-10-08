@@ -13,7 +13,7 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://192.168.1.100:5000/api/auth/register', { username, email, password });
+      await axios.post('http://127.0.0.1:5000/api/auth/register', { username, email, password });
       navigate('/'); // Redirect to Login after successful registration
     } catch (error) {
       setErrorMessage(error.response?.data?.message || 'Something went wrong');
