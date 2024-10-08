@@ -1,29 +1,26 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import AuthScreen from './AuthScreen';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Login from './Login';
 import Home from './Home';
 
-const App = () => {
-  const [loggedInUser, setLoggedInUser] = useState(null);
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const handleLoginSuccess = (username) => {
-    setLoggedInUser(username);
-  };
+  useEffect(() => {
+    const username = localStorage.getItem('username');
+    if (username) {
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   return (
     <Router>
       <Routes>
-        <Route
-          path="/"
-          element={<AuthScreen onLoginSuccess={handleLoginSuccess} />}
-        />
-        <Route
-          path="/home"
-          element={<Home username={loggedInUser} />}
-        />
+        <Route path="/" element={isAuthenticated ? <Navigate to="/home" /> : <Login setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/home" element={isAuthenticated ? <Home /> : <Navigate to="/" />} />
       </Routes>
     </Router>
   );
-};
+}
 
 export default App;
