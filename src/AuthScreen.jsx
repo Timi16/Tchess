@@ -1,18 +1,106 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Button, TextField, Typography } from "@mui/material";
+import { Button, TextField, Typography, CircularProgress, Snackbar } from "@mui/material";
 
-const AuthScreen = ({ navigateToForgotPassword }) => {
+const AuthScreen = ({ navigateToForgotPassword, onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [errors, setErrors] = useState({ email: "", password: "", username: "" });
+  const [loading, setLoading] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
+    setErrors({ email: "", password: "", username: "" });
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = { email: "", password: "", username: "" };
+
+    if (!email) {
+      newErrors.email = "Email is required";
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Please enter a valid email address";
+      isValid = false;
+    }
+
+    if (!password) {
+      newErrors.password = "Password is required";
+      isValid = false;
+    }
+
+    if (!isLogin && !username) {
+      newErrors.username = "Username is required for registration";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      setLoading(true);
+      try {
+        let response;
+        if (isLogin) {
+          response = await fetch("https://tchess-backend.onrender.com/api/auth/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+          });
+        } else {
+          response = await fetch("https://tchess-backend.onrender.com/api/auth/register", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password, username }),
+          });
+        }
+
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Successful login/registration
+          if (isLogin) {
+            // Redirect or show the home page
+            onLoginSuccess(data.username); // Pass username to the parent component
+          } else {
+            setSnackbarMessage("Registration successful! Please login.");
+          }
+        } else {
+          // Handle unsuccessful login/registration
+          setSnackbarMessage(data.message || "An error occurred");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        setSnackbarMessage("An unexpected error occurred. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      console.log("Form has errors");
+    }
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   return (
     <Container>
-      <FormWrapper>
+      <FormWrapper onSubmit={handleSubmit}>
         <Title variant="h4">{isLogin ? "Login" : "Register"}</Title>
+
         {!isLogin && (
           <StyledTextField
             variant="outlined"
@@ -20,31 +108,45 @@ const AuthScreen = ({ navigateToForgotPassword }) => {
             type="text"
             fullWidth
             margin="normal"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            error={!!errors.username}
+            helperText={errors.username}
           />
         )}
+
         <StyledTextField
           variant="outlined"
           label="Email"
           type="email"
           fullWidth
           margin="normal"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          error={!!errors.email}
+          helperText={errors.email}
         />
+
         <StyledTextField
           variant="outlined"
           label="Password"
           type="password"
           fullWidth
           margin="normal"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          error={!!errors.password}
+          helperText={errors.password}
         />
 
         {isLogin && (
-          <ForgotPasswordText onClick={navigateToForgotPassword}>
+          <ForgotPasswordLink onClick={navigateToForgotPassword}>
             Forgot Password?
-          </ForgotPasswordText>
+          </ForgotPasswordLink>
         )}
 
-        <StyledButton variant="contained" fullWidth>
-          {isLogin ? "Login" : "Register"}
+        <StyledButton variant="contained" type="submit" fullWidth disabled={loading}>
+          {loading ? <CircularProgress size={24} color="inherit" /> : isLogin ? "Login" : "Register"}
         </StyledButton>
 
         <SwitchModeText onClick={toggleMode}>
@@ -53,6 +155,18 @@ const AuthScreen = ({ navigateToForgotPassword }) => {
             : "Already have an account? Login"}
         </SwitchModeText>
       </FormWrapper>
+
+      <Snackbar
+        open={!!snackbarMessage}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+        action={
+          <Button color="inherit" onClick={handleSnackbarClose}>
+            Close
+          </Button>
+        }
+      />
     </Container>
   );
 };
@@ -64,10 +178,10 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #000000 0%, #000080 100%);
+  background: linear-gradient(135deg, #000000 0%, #001f3f 100%);
 `;
 
-const FormWrapper = styled.div`
+const FormWrapper = styled.form`
   width: 100%;
   max-width: 400px;
   padding: 2rem;
@@ -83,6 +197,8 @@ const Title = styled(Typography)`
 `;
 
 const StyledTextField = styled(TextField)`
+  margin-bottom: 1rem !important;
+
   & label {
     color: white;
   }
@@ -97,41 +213,49 @@ const StyledTextField = styled(TextField)`
     }
 
     &:hover fieldset {
-      border-color: #0000ff;
+      border-color: #1e90ff;
     }
 
     &.Mui-focused fieldset {
-      border-color: #0000ff;
+      border-color: #1e90ff;
     }
+  }
+
+  & .MuiFormHelperText-root {
+    color: red !important;
   }
 `;
 
 const StyledButton = styled(Button)`
-  margin-top: 1rem !important;
-  background-color: #0000ff !important;
+  margin-top: 1.5rem !important;
+  background-color: #1e90ff !important;
   color: white !important;
 
   &:hover {
-    background-color: #1a1aff !important;
+    background-color: #4682b4 !important;
   }
 `;
 
-const ForgotPasswordText = styled(Typography)`
-  color: white;
+const ForgotPasswordLink = styled(Typography)`
+  color: #1e90ff;
   text-align: right;
   margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
   cursor: pointer;
+  text-decoration: underline;
+
   &:hover {
-    color: #0000ff;
+    color: #4682b4;
   }
 `;
 
 const SwitchModeText = styled(Typography)`
   color: white;
   text-align: center;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   cursor: pointer;
+
   &:hover {
-    color: #0000ff;
+    color: #1e90ff;
   }
 `;

@@ -1,22 +1,23 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import AuthScreen from "./AuthScreen";
-import ForgotPasswordScreen from "./ForgotPasswordScreen";
-import ResetPasswordScreen from "./ResetPasswordScreen";
+import React, { useState } from 'react';
+import AuthScreen from './AuthScreen';
+import Home from './Home';
 
-function App() {
+const App = () => {
+  const [username, setUsername] = useState(null);
+
+  const handleLoginSuccess = (user) => {
+    setUsername(user);
+  };
+
   return (
-    <Router>
-      <Routes>
-        <Route
-          path="/"
-          element={<AuthScreen navigateToForgotPassword={() => window.location.href = '/forgot-password'} />}
-        />
-        <Route path="/forgot-password" element={<ForgotPasswordScreen navigateToResetPassword={() => window.location.href = '/reset-password'} />} />
-        <Route path="/reset-password" element={<ResetPasswordScreen />} />
-      </Routes>
-    </Router>
+    <div>
+      {username ? (
+        <Home username={username} />
+      ) : (
+        <AuthScreen navigateToForgotPassword={() => {}} onLoginSuccess={handleLoginSuccess} />
+      )}
+    </div>
   );
-}
+};
 
 export default App;
