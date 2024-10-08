@@ -1,16 +1,29 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AuthScreen from './AuthScreen';
-import Home from './Home'; // Ensure you have a Home component
+import Home from './Home';
 
-function App() {
+const App = () => {
+  const [loggedInUser, setLoggedInUser] = useState(null);
+
+  const handleLoginSuccess = (username) => {
+    setLoggedInUser(username);
+  };
+
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<AuthScreen />} />
-        <Route path="/home" element={<Home />} />
+        <Route
+          path="/"
+          element={<AuthScreen onLoginSuccess={handleLoginSuccess} />}
+        />
+        <Route
+          path="/home"
+          element={<Home username={loggedInUser} />}
+        />
       </Routes>
     </Router>
   );
-}
+};
 
 export default App;

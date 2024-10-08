@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Button, TextField, Typography, CircularProgress, Snackbar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const AuthScreen = ({ onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -52,52 +53,39 @@ const AuthScreen = ({ onLoginSuccess }) => {
       try {
         let response;
         if (isLogin) {
-          response = await fetch("https://tchess-backend.onrender.com/api/auth/login", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, password }),
-          });
+          response = await axios.post(
+            "https://tchess-backend.onrender.com/api/auth/login",
+            { email, password }
+          );
         } else {
-          response = await fetch("https://tchess-backend.onrender.com/api/auth/register", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, password, username }),
-          });
+          response = await axios.post(
+            "https://tchess-backend.onrender.com/api/auth/register",
+            { email, password, username }
+          );
         }
 
-        const data = await response.json();
-
-        // Check response status and handle accordingly
-        if (response.ok) {
+        // Handle response
+        if (response.status === 200) {
           if (isLogin) {
-            console.log("Login successful:", data); // Debugging log
-            onLoginSuccess(data.username); // Pass username to parent
-            navigate("/home"); // Navigate to home
+            onLoginSuccess(response.data.username);
+            navigate("/home");
           } else {
             setSnackbarMessage("Registration successful! Please log in.");
             setSnackbarOpen(true);
             setTimeout(() => {
-              navigate("/"); // Redirect to login after a delay
+              navigate("/");
             }, 3000);
           }
         } else {
-          console.log("Error response:", data); // Debugging log
-          setSnackbarMessage(data.message || "An error occurred");
+          setSnackbarMessage(response.data.message || "An error occurred");
           setSnackbarOpen(true);
         }
       } catch (error) {
-        console.error("Error:", error);
-        setSnackbarMessage("An unexpected error occurred. Please try again.");
+        setSnackbarMessage(error.response?.data?.message || "An unexpected error occurred.");
         setSnackbarOpen(true);
       } finally {
         setLoading(false);
       }
-    } else {
-      console.log("Form has errors"); // Debugging log
     }
   };
 
@@ -114,7 +102,6 @@ const AuthScreen = ({ onLoginSuccess }) => {
           <StyledTextField
             variant="outlined"
             label="Username"
-            type="text"
             fullWidth
             margin="normal"
             value={username}
@@ -127,7 +114,6 @@ const AuthScreen = ({ onLoginSuccess }) => {
         <StyledTextField
           variant="outlined"
           label="Email"
-          type="email"
           fullWidth
           margin="normal"
           value={email}
@@ -139,7 +125,6 @@ const AuthScreen = ({ onLoginSuccess }) => {
         <StyledTextField
           variant="outlined"
           label="Password"
-          type="password"
           fullWidth
           margin="normal"
           value={password}
@@ -162,11 +147,7 @@ const AuthScreen = ({ onLoginSuccess }) => {
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
         message={snackbarMessage}
-        action={
-          <Button color="inherit" onClick={handleSnackbarClose}>
-            Close
-          </Button>
-        }
+        action={<Button color="inherit" onClick={handleSnackbarClose}>Close</Button>}
       />
     </Container>
   );
@@ -174,79 +155,73 @@ const AuthScreen = ({ onLoginSuccess }) => {
 
 export default AuthScreen;
 
-
-
-
+// Styled Components
 const Container = styled.div`
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #000000 0%, #001f3f 100%);
+  background-color: #e0f7fa;
 `;
 
 const FormWrapper = styled.form`
   width: 100%;
   max-width: 400px;
   padding: 2rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
 `;
 
 const Title = styled(Typography)`
-  color: white;
+  color: #00796b;
   text-align: center;
   margin-bottom: 1.5rem;
 `;
 
 const StyledTextField = styled(TextField)`
-  margin-bottom: 1rem !important;
+  margin-bottom: 1rem;
 
   & label {
-    color: white;
-  }
-
-  & input {
-    color: white;
+    color: #00796b;
   }
 
   & .MuiOutlinedInput-root {
     & fieldset {
-      border-color: white;
+      border-color: #00796b;
     }
 
     &:hover fieldset {
-      border-color: #1e90ff;
+      border-color: #004d40;
     }
 
     &.Mui-focused fieldset {
-      border-color: #1e90ff;
+      border-color: #004d40;
     }
   }
 
   & .MuiFormHelperText-root {
-    color: red !important;
+    color: #d32f2f !important;
   }
 `;
 
 const StyledButton = styled(Button)`
-  margin-top: 1.5rem !important;
-  background-color: #1e90ff !important;
+  margin-top: 1.5rem;
+  background-color: #00796b !important;
   color: white !important;
 
   &:hover {
-    background-color: #4682b4 !important;
+    background-color: #004d40 !important;
   }
 `;
 
 const SwitchModeText = styled(Typography)`
-  color: white;
+  color: #00796b;
   text-align: center;
   margin-top: 1.5rem;
   cursor: pointer;
 
   &:hover {
-    color: #1e90ff;
+    color: #004d40;
   }
 `;
