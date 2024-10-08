@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Button, TextField, Typography, CircularProgress, Snackbar } from "@mui/material";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
-const AuthScreen = ({ navigateToForgotPassword, onLoginSuccess }) => {
+const AuthScreen = ({ onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,6 +12,7 @@ const AuthScreen = ({ navigateToForgotPassword, onLoginSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
@@ -70,20 +72,24 @@ const AuthScreen = ({ navigateToForgotPassword, onLoginSuccess }) => {
         const data = await response.json();
         
         if (response.ok) {
-          // Successful login/registration
           if (isLogin) {
-            // Redirect or show the home page
             onLoginSuccess(data.username); // Pass username to the parent component
+            navigate("/home"); // Navigate to the home page
           } else {
-            setSnackbarMessage("Registration successful! Please login.");
+            setSnackbarMessage("Registration successful! Please log in.");
+            setSnackbarOpen(true);
+            setTimeout(() => {
+              navigate("/"); // Redirect to login page after showing message
+            }, 3000); // Wait for 3 seconds before navigating
           }
         } else {
-          // Handle unsuccessful login/registration
           setSnackbarMessage(data.message || "An error occurred");
+          setSnackbarOpen(true);
         }
       } catch (error) {
         console.error("Error:", error);
         setSnackbarMessage("An unexpected error occurred. Please try again.");
+        setSnackbarOpen(true);
       } finally {
         setLoading(false);
       }
@@ -139,25 +145,17 @@ const AuthScreen = ({ navigateToForgotPassword, onLoginSuccess }) => {
           helperText={errors.password}
         />
 
-        {isLogin && (
-          <ForgotPasswordLink onClick={navigateToForgotPassword}>
-            Forgot Password?
-          </ForgotPasswordLink>
-        )}
-
         <StyledButton variant="contained" type="submit" fullWidth disabled={loading}>
           {loading ? <CircularProgress size={24} color="inherit" /> : isLogin ? "Login" : "Register"}
         </StyledButton>
 
         <SwitchModeText onClick={toggleMode}>
-          {isLogin
-            ? "Don't have an account? Register"
-            : "Already have an account? Login"}
+          {isLogin ? "Don't have an account? Register" : "Already have an account? Login"}
         </SwitchModeText>
       </FormWrapper>
 
       <Snackbar
-        open={!!snackbarMessage}
+        open={snackbarOpen}
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
         message={snackbarMessage}
@@ -233,19 +231,6 @@ const StyledButton = styled(Button)`
 
   &:hover {
     background-color: #4682b4 !important;
-  }
-`;
-
-const ForgotPasswordLink = styled(Typography)`
-  color: #1e90ff;
-  text-align: right;
-  margin-top: 0.5rem;
-  margin-bottom: 1.5rem;
-  cursor: pointer;
-  text-decoration: underline;
-
-  &:hover {
-    color: #4682b4;
   }
 `;
 

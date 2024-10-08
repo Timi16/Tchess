@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import AuthScreen from './AuthScreen';
 import Home from './Home';
 
@@ -10,13 +11,18 @@ const App = () => {
   };
 
   return (
-    <div>
-      {username ? (
-        <Home username={username} />
-      ) : (
-        <AuthScreen navigateToForgotPassword={() => {}} onLoginSuccess={handleLoginSuccess} />
-      )}
-    </div>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={username ? <Navigate to="/home" /> : <AuthScreen onLoginSuccess={handleLoginSuccess} />}
+        />
+        <Route
+          path="/home"
+          element={username ? <Home username={username} /> : <Navigate to="/" />}
+        />
+      </Routes>
+    </Router>
   );
 };
 
