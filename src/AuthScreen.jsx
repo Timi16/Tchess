@@ -66,9 +66,10 @@ const AuthScreen = ({ onLoginSuccess }) => {
 
         // Handle response
         if (response.status === 200) {
-          const loggedInUsername = response.data.username;
-          localStorage.setItem("username", loggedInUsername); // Store username in local storage
-          onLoginSuccess(loggedInUsername);
+          const loggedInEmail = response.data.email; // Assuming the response has the email field
+          const firstPartOfEmail = loggedInEmail.split('@')[0]; // Get the part before '@'
+          localStorage.setItem("username", firstPartOfEmail); // Store username in local storage
+          onLoginSuccess(firstPartOfEmail);
           navigate("/home");
         } else {
           setSnackbarMessage(response.data.message || "An error occurred");
