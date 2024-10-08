@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 function Login({ setIsAuthenticated }) {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true); // Switch between Login and Register
 
@@ -11,13 +12,18 @@ function Login({ setIsAuthenticated }) {
       ? "https://tchess-backend.onrender.com/api/auth/login"
       : "https://tchess-backend.onrender.com/api/auth/register";
 
+    // Create the request body dynamically based on login or register
+    const body = isLogin
+      ? { username, password }
+      : { username, email, password }; // Include email only during registration
+
     try {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify(body),
       });
 
       const data = await response.json();
@@ -48,6 +54,17 @@ function Login({ setIsAuthenticated }) {
             required
           />
         </div>
+        {!isLogin && (
+          <div>
+            <label>Email:</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+        )}
         <div>
           <label>Password:</label>
           <input
