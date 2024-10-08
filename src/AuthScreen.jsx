@@ -66,16 +66,10 @@ const AuthScreen = ({ onLoginSuccess }) => {
 
         // Handle response
         if (response.status === 200) {
-          if (isLogin) {
-            onLoginSuccess(response.data.username);
-            navigate("/home");
-          } else {
-            setSnackbarMessage("Registration successful! Please log in.");
-            setSnackbarOpen(true);
-            setTimeout(() => {
-              navigate("/");
-            }, 3000);
-          }
+          const loggedInUsername = response.data.username;
+          localStorage.setItem("username", loggedInUsername); // Store username in local storage
+          onLoginSuccess(loggedInUsername);
+          navigate("/home");
         } else {
           setSnackbarMessage(response.data.message || "An error occurred");
           setSnackbarOpen(true);
@@ -122,7 +116,6 @@ const AuthScreen = ({ onLoginSuccess }) => {
           helperText={errors.email}
         />
 
-        {/* Password input field updated to hide input */}
         <StyledTextField
           variant="outlined"
           label="Password"

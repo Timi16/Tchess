@@ -1,18 +1,30 @@
-import React from 'react';
-import styled from 'styled-components';
-import { Typography, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+import { Button, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-const Home = ({ username }) => {
+const Home = () => {
+  const [username, setUsername] = useState("");
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      setUsername(storedUsername);
+    } else {
+      navigate("/");
+    }
+  }, [navigate]);
+
   const handleLogout = () => {
-    navigate('/');
+    localStorage.removeItem("username");
+    navigate("/");
   };
 
   return (
     <Container>
-      <WelcomeText variant="h4">Welcome, {username}!</WelcomeText>
+      <Typography variant="h4">Welcome, {username}!</Typography>
+      <Typography variant="subtitle1">You are logged in successfully.</Typography>
       <StyledButton variant="contained" onClick={handleLogout}>
         Logout
       </StyledButton>
@@ -26,18 +38,14 @@ export default Home;
 const Container = styled.div`
   height: 100vh;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   background-color: #e0f7fa;
 `;
 
-const WelcomeText = styled(Typography)`
-  color: #00796b;
-  margin-bottom: 2rem;
-`;
-
 const StyledButton = styled(Button)`
+  margin-top: 1.5rem;
   background-color: #00796b !important;
   color: white !important;
 
