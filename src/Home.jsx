@@ -1,19 +1,15 @@
 import React from 'react';
 
-function Home() {
+const Home = () => {
   const username = localStorage.getItem('username');
-
-  const handleLogout = () => {
-    localStorage.removeItem('username');
-    window.location.reload();
-  };
 
   return (
     <div>
       <h1>Welcome, {username}!</h1>
-      <button onClick={handleLogout}>Logout</button>
+      <p>This is your home page.</p>
+      {/* Add more content here */}
     </div>
   );
-}
+};
 
 export default Home;
